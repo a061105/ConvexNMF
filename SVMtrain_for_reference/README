@@ -1,0 +1,6 @@
+This is the Randomized Dual Coordinate Descent solver for Hinge-Loss L2R SVM (same to libliner -s 3).
+
+Usage: 
+
+./svrTrain [train file] (modelFile)
+./svrPredict [testData] [modelFile]
