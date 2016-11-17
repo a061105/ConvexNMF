@@ -48,7 +48,7 @@ inline double* get_sparse_row(vector< Instance* >* data ,int row ,int position,i
     	for(int i=0;i<ins->xi.size();i++){			
 			int index = ins->xi[i].first;
 			double value = ins->xi[i].second;
-			v[index-1]=value;			
+			v[index]=value;			
 		}  
 		return v;  	
     }
@@ -60,7 +60,7 @@ inline double* get_sparse_row(vector< Instance* >* data ,int row ,int position,i
 	        for(int j=0;j<ins->xi.size();j++){			
 				int index = ins->xi[j].first;
 				double value = ins->xi[j].second;
-				if((index-1) == position){
+				if((index) == position){
 					v[i]=value;					
 					break;					
 				}				
@@ -124,6 +124,7 @@ int main(int argc, char** argv){
 		  w[i] = 0.0;
 		for(int i=0;i<N;i++)
 		  alpha[i] = 0.0;
+		double object_value=0.0;
 		//reach R_u
 		double *R= get_sparse_row(data_R,0,u,D); 
 		while(iter < max_iter){			
@@ -150,28 +151,29 @@ int main(int argc, char** argv){
 			update_time += omp_get_wtime();
 			//if(iter%10==0)
 			//computer object_value, overhead?
-			double object_value=0.0;
-			double* temp = new double[K];
-			double* Z_temp;
-			for(int i=0;i<K;i++){
-				temp[i]=0.0;
-			}			
-			for(int i=0;i<N;i++){
-				Z_temp=get_sparse_row(data_Z,1,i,K);
-				for(int j=0;j<K;j++){
-					temp[j]=temp[j]+alpha[i]*Z_temp[j];					
+			//if(iter%10==0){
+				double* temp = new double[K];
+				double* Z_temp;
+				for(int i=0;i<K;i++){
+					temp[i]=0.0;
+				}			
+				for(int i=0;i<N;i++){
+					Z_temp=get_sparse_row(data_Z,1,i,K);
+					for(int j=0;j<K;j++){
+						temp[j]=temp[j]+alpha[i]*Z_temp[j];					
+					}
 				}
-			}
-			//take positive
-			for(int j=0;j<K;j++){
-					temp[j]=max(0.0,temp[j]);
-			}
-			object_value=0.5*pure_dot(temp,temp,K)-pure_dot(R,alpha,N)+0.5*pure_dot(alpha,alpha,N);
+				//take positive
+				for(int j=0;j<K;j++){
+						temp[j]=max(0.0,temp[j]);
+				}
+				object_value=0.5*pure_dot(temp,temp,K)-pure_dot(R,alpha,N)+0.5*pure_dot(alpha,alpha,N);
+				delete [] Z_temp;
+			    delete [] temp;
+		   // }
 			cerr <<"D="<<u<<", iter=" << iter << ", time=" << update_time <<" ,object_value="<<object_value<<endl ;			
 			shuffle(index);
-			iter++;
-			delete [] Z_temp;
-			delete [] temp;
+			iter++;		
 		}
 		delete [] R;
 		cerr << endl;

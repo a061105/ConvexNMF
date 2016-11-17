@@ -58,7 +58,7 @@ class Parser{
 			
 			data->push_back( ins );
 		}
-		
+		numFea++;
 		//data->pop_back();
 		delete[] line;
 		return data;
