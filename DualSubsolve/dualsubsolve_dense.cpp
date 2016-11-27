@@ -83,7 +83,10 @@ int main(int argc, char** argv){
 	cerr << "K=" << K << endl;	
 	double* w = new double[K];
 	double* alpha = new double[N];
-	double R[D][N];
+	double** R = new double*[D];
+	for(int i=0;i<D;i++){
+		R[i] = new double[N];
+	}
 	//compute upper bound and initialization
 	double* H_bound = new double [N];
 	for(int i=0;i<N;i++){
