@@ -117,7 +117,7 @@ int main(int argc, char** argv){
 		for(int i=0;i<N;i++)
 			index.push_back(i);
 		shuffle(index);
-		int max_iter = 300;
+		int max_iter = 80;
 		int iter=0;
 		//initialize 
 		for(int i=0;i<K;i++)

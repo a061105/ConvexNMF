@@ -43,32 +43,16 @@ inline double* get_sparse_row(vector< Instance* >* data ,int row ,int position,i
    if(row==1){
    		double* v = new double[numFea];
     	Instance* ins = data->at(position);
-    	for(int i=0;i<numFea;i++)
+     	for(int i=0;i<numFea;i++)
     		v[i]=0.0;
-    	for(int i=0;i<ins->xi.size();i++){			
+    	for(int i=0;i<ins->xi.size();i++){	
 			int index = ins->xi[i].first;
 			double value = ins->xi[i].second;
-			v[index-1]=value;			
+			v[index-1]=value;
+
 		}  
 		return v;  	
     }
-   else{
-	   	double* v = new double[N];
-	   	for(int i=0;i<N;i++){
-	   		v[i]=0;
-	   		Instance* ins = data->at(i);
-	        for(int j=0;j<ins->xi.size();j++){			
-				int index = ins->xi[j].first;
-				double value = ins->xi[j].second;
-				if((index-1) == position){
-					v[i]=value;					
-					break;					
-				}				
-		    }   
-
-	   	}
-	   	return v;
-   }   
 }
 vector< Instance* >* rdata(vector<Instance*>* data, int numFea){
 
@@ -78,19 +62,19 @@ vector< Instance* >* rdata(vector<Instance*>* data, int numFea){
                 Instance* ins = new Instance();
                 reverse_data->push_back( ins );
         }
-        pair<int,double> pair;
         for(int i=0;i<n;i++){
 
                 Instance* ins = data->at(i);
                 for(int j=0;j<ins->xi.size();j++){
                         int index = ins->xi[j].first;
                         double value = ins->xi[j].second;
-                        pair<int,double> pair;
+                        pair<int,double> pair;                        
                         pair.first = i+1;
                         pair.second = value;
                         reverse_data->at(index-1)->xi.push_back(pair);
                 }
         }
+        return reverse_data;
 }
 //index start at 1
 int main(int argc, char** argv){
@@ -135,12 +119,13 @@ int main(int argc, char** argv){
 	}
 	//Outer Loop D times
 	ofstream fout(modelFile);
-	for(int u=0;u<D;u++){		
+	for(int u=0;u<D;u++){
+
 		vector<int> index;
 		for(int i=0;i<N;i++)
 			index.push_back(i);
 		shuffle(index);
-		int max_iter = 300;
+		int max_iter = 80;
 		int iter=0;
 		//initialize 
 		for(int i=0;i<K;i++)
@@ -149,9 +134,9 @@ int main(int argc, char** argv){
 		  alpha[i] = 0.0;
 		double object_value=0.0;
 		//reach R_u
-		double *R= get_sparse_row(data_R,1,u,D); 
-		while(iter < max_iter){			
-			double update_time = -omp_get_wtime();
+		double *R= get_sparse_row(data_R,1,u,N); 
+		while(iter < max_iter){	
+		   	double update_time = -omp_get_wtime();
 			//start inner loop
 			for(int r=0;r<N;r++){ 
 				//choose random gradient to update
