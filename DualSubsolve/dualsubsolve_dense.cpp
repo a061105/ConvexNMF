@@ -74,23 +74,24 @@ inline double get_objvalue(double** R, double** V, vector< Instance* >* Z,int N,
 
     }
     delete[] temp_row;
-    return result;
+    return 0.5*result;
 }
 //index start from 1 in the data  
 int main(int argc, char** argv){
 
 	
-	if( argc < 4 ){
-		cerr << "Usage: dualsubsolve [Z] [R] [lambda](modelFile)\n";
+	if( argc < 5 ){
+		cerr << "Usage: ./dualsubsolve_dense [Z] [R] [lambda] [max_iter] (modelFile)\n";
 		exit(0);
 	}
 	
 	char* ZFile = argv[1];
     char* RFile = argv[2];
     double lambda = atof(argv[3]);
+    int  max_iter=atoi(argv[4]);
 	char* modelFile;
-	if( argc >= 5 )
-		modelFile = argv[4];
+	if( argc >= 6 )
+		modelFile = argv[5];
 	else{
 		modelFile = "model";
 	}
@@ -140,7 +141,6 @@ int main(int argc, char** argv){
     vector<int> index;
 	for(int i=0;i<N;i++)
 		index.push_back(i);
-	int max_iter = 100;
 	int iter;
 	double object_value;
 	//Outer Loop D times
