@@ -49,11 +49,34 @@ inline double* get_sparse_row(vector< Instance* >* data ,int row ,int position,i
 			int index = ins->xi[i].first;
 			double value = ins->xi[i].second;
 			v[index-1]=value;			
-		}  
+		} 		 
 		return v;  	
     }   
 }
-//index start from 1 in the data
+inline double get_objvalue(double** R, double** V, vector< Instance* >* Z,int N,int K,int D){
+	double result=0.0;
+	double* temp_row= new double[D];
+    for(int i=0;i<N;i++){
+    	for(int j=0;j<D;j++){
+    		temp_row[j]=0.0;
+     	}
+    	Instance* ins = Z->at(i);
+    	for(int j=0;j<ins->xi.size();j++){			
+			int index = ins->xi[j].first-1;
+			double value = ins->xi[j].second;
+			for(int k=0;k<D;k++){
+				temp_row[k]+=value*V[index][k];
+			}	
+		} 
+		for(int j=0;j<D;j++){
+    		result=result+(R[j][i]-temp_row[j])*(R[j][i]-temp_row[j]);
+    	}
+
+    }
+    delete[] temp_row;
+    return result;
+}
+//index start from 1 in the data  
 int main(int argc, char** argv){
 
 	
@@ -84,6 +107,10 @@ int main(int argc, char** argv){
 	double* w = new double[K];
 	double* alpha = new double[N];
 	double** R = new double*[D];
+	double** V =new double*[K]; 
+	for(int i=0;i<K;i++){
+		V[i] = new double[D];
+	}
 	for(int i=0;i<D;i++){
 		R[i] = new double[N];
 	}
@@ -96,7 +123,7 @@ int main(int argc, char** argv){
 		    double value = ins->xi[j].second*ins->xi[j].second;
 		    square_sum += value;
 		}
-		H_bound[i]=square_sum;
+		H_bound[i]=square_sum/lambda+1.0;
 	}
 	for (int j=0;j<D;j++){
 		for(int i=0;i<N;i++)
@@ -110,21 +137,24 @@ int main(int argc, char** argv){
 				R[index-1][j]=value;					
 		    }
     }
+    vector<int> index;
+	for(int i=0;i<N;i++)
+		index.push_back(i);
+	int max_iter = 100;
+	int iter;
+	double object_value;
 	//Outer Loop D times
 	ofstream fout(modelFile);
 	for(int u=0;u<D;u++){		
-		vector<int> index;
-		for(int i=0;i<N;i++)
-			index.push_back(i);
+		
 		shuffle(index);
-		int max_iter = 80;
-		int iter=0;
+		iter=0;
 		//initialize 
 		for(int i=0;i<K;i++)
 		  w[i] = 0.0;
 		for(int i=0;i<N;i++)
 		  alpha[i] = 0.0;
-		double object_value=0.0;
+		object_value=0.0;
 		//reach R_u
 		while(iter < max_iter){			
 			double update_time = -omp_get_wtime();
@@ -134,7 +164,7 @@ int main(int argc, char** argv){
 				int i = index[r];
 				double* Z=get_sparse_row(data_Z,1,i,K);
 				//1. compute gradient of i 
-				double gi = 1.0/lambda*pure_dot(Z,w,K)-R[u][i]+alpha[i];
+				double gi = (1.0/lambda)*pure_dot(Z,w,K)-R[u][i]+alpha[i];
 				//2. compute alpha_u_i
 				double new_alpha = alpha[i]-gi/H_bound[i];
 				//3. maintain w
@@ -145,30 +175,31 @@ int main(int argc, char** argv){
 					}			
 					alpha[i] = new_alpha;
 				}				
-				delete [] Z;
+				delete[] Z;
 			}
 			update_time += omp_get_wtime();
 			//if(iter%10==0)
 			//computer object_value, overhead?
 			//if(iter%10==0){
-				double* temp = new double[K];
-				double* Z_temp;
+				double* temp = new double[K];				
 				for(int i=0;i<K;i++){
 					temp[i]=0.0;
 				}			
 				for(int i=0;i<N;i++){
+					double* Z_temp;
 					Z_temp=get_sparse_row(data_Z,1,i,K);
 					for(int j=0;j<K;j++){
 						temp[j]=temp[j]+alpha[i]*Z_temp[j];					
 					}
+					delete[] Z_temp;
 				}
 				//take positive
 				for(int j=0;j<K;j++){
 						temp[j]=max(0.0,temp[j]);
 				}
-				object_value=0.5/lambda*pure_dot(temp,temp,K)-pure_dot(R[u],alpha,N)+0.5*pure_dot(alpha,alpha,N);
-				delete [] Z_temp;
-			    delete [] temp;
+				object_value=(0.5/lambda)*pure_dot(temp,temp,K)-pure_dot(R[u],alpha,N)+0.5*pure_dot(alpha,alpha,N);
+				
+			    delete[] temp;
 		   // }
 			cerr <<"D="<<u<<", iter=" << iter << ", time=" << update_time <<" ,object_value="<<object_value<<endl ;			
 			shuffle(index);
@@ -177,14 +208,23 @@ int main(int argc, char** argv){
 		
 		cerr << endl;
 		//output u_th model
-	
+	//update V;
+	for(int i=0;i<K;i++)
+			V[i][u]=w[i];
 	fout << u << endl;
 	for(int i=0;i<N;i++)
 		if( fabs(alpha[i]) > 1e-12 )
 			fout << i << " " << alpha[i] << endl;
-	
 	} 	
 	//release memory
-	delete [] alpha;
+	delete[] alpha;
+	for(int i=0;i<K;i++){
+		for(int j=0;j<D;j++){
+			printf("V[%d][%d]=%lf ",i,j,V[i][j]);
+		}
+		cout<<endl;
+	}		
+    double result = get_objvalue(R,V,data_Z,N,K,D);
+    cout<<"Final result:"<<result<<endl;
 	fout.close();
 }
