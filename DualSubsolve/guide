@@ -1,0 +1,15 @@
+function [V alpha objGCD] = CDS_D (R,Z,max_iter,lambda)
+% input: 
+%		R: the input n by d dense matrix 
+%		Z: the input n by k dense  matrix 
+%		maxiter: maximum number of iterations
+%		lambda: regularization weights
+%
+% output:
+%		V: k by d dense matrix
+%       alpha:  n by d dense matrix     
+%		objCD: final objective values. 
+
+
+
+	 
