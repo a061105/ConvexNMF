@@ -1,3 +1,11 @@
+Compile:
+	
+	(In Matlab Mode)
+	mex CDS_D.cpp
+
+Usage:
+
+
 function [V alpha objGCD] = CDS_D (R,Z,max_iter,lambda)
 % input: 
 %		R: the input n by d dense matrix 
