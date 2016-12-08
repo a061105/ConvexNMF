@@ -3,7 +3,7 @@ Compile:
 	(In Matlab Mode)
 	mex CDS_D.cpp
 
-Usage:
+Solver Usage:
 
 
 function [V alpha objGCD] = CDS_D (R,Z,max_iter,lambda)
@@ -14,10 +14,16 @@ function [V alpha objGCD] = CDS_D (R,Z,max_iter,lambda)
 %		lambda: regularization weights
 %
 % output:
-%		V: k by d dense matrix
-%       alpha:  n by d dense matrix     
-%		objCD: final objective values. 
+%		V:	k by d dense matrix
+%       	alpha:	n by d dense matrix     
+%		objCD:	final objective values. 	 
 
 
+Read data in Libsvm format:
 
-	 
+cd '../liblinear-2.1/matlab';
+[y_tmp, R] = libsvmread( R_path );
+[y_tmp, Z] = libsvmread( Z_path );
+R = full(R);
+Z = full(Z);
+cd '-';
