@@ -65,7 +65,7 @@ inline double get_objvalue_d(double* R, double* V, double* Z,int N,int K,int D){
 	delete[] temp_row;
 	return 0.5*result;
 }
-void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V, double* alpha ,double* objCD,int N,int D, int K){
+void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V, double* A,double* objCD,int N,int D, int K){
 	//calculate Hessian diagonal
 	double* H_bound = new double [N];
 	change_major(Z,N,K);
@@ -78,6 +78,7 @@ void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V
 	}
 	//initialize 
 	double* w = new double[K];
+	double* alpha = new double[N];
 	double object_value;
 	vector<int> index;
 	for(int i=0;i<N;i++)
@@ -91,7 +92,7 @@ void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V
 		for(int i=0;i<K;i++)
 			w[i] = 0.0;
 		for(int i=0;i<N;i++)
-			*(alpha+u*N+i) = 0.0;
+			alpha[i] = 0.0;
 		object_value=0.0;
 		//reach R_u
 		while(iter < max_iter){
@@ -102,40 +103,40 @@ void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V
 				//choose random gradient to update
 				int i = index[r];
 				//1. compute gradient of i 
-				double gi = (1.0/lambda)*pure_dot_x_nng(Z+K*i,w,K)-*(R+u*N+i)+*(alpha+u*N+i);
+				double gi = (1.0/lambda)*pure_dot_x_nng(Z+K*i,w,K)-*(R+u*N+i)+alpha[i];
 				//2. compute alpha_u_i
-				double new_alpha = *(alpha+u*N+i)-gi/H_bound[i];
+				double new_alpha = alpha[i]-gi/H_bound[i];
 				//3. maintain w
-				double alpha_diff = new_alpha-*(alpha+u*N+i);
+				double alpha_diff = new_alpha-alpha[i];
 				if(  fabs(alpha_diff) > 1e-8 ){
 					for(int o=0;o<K;o++){
 						w[o] = w[o]+alpha_diff*(*(Z+K*i+o));
 					}			
-					*(alpha+u*N+i) = new_alpha;
+					alpha[i] = new_alpha;
 				}				
 			}
 
 			//if(iter%10==0)
 			//computer object_value, overhead?
 			//if(iter%10==0){
-			double* temp = new double[K];				
+			/*double* temp = new double[K];				
 			for(int i=0;i<K;i++){
 				temp[i]=0.0;
 			}			
 			for(int i=0;i<N;i++){
 				for(int j=0;j<K;j++){
-					temp[j]=temp[j]+*(alpha+i+u*N)*(*(Z+i*K+j));					
+					temp[j]=temp[j]+alpha[i]*(*(Z+i*K+j));					
 				}
 			}
 			//take positive
 			for(int j=0;j<K;j++){
 				temp[j]=max(0.0,temp[j]);
 			}
-			object_value=(0.5/lambda)*pure_dot(temp,temp,K)-pure_dot(R+u*N,alpha+u*N,N)+0.5*pure_dot(alpha+u*N,alpha+u*N,N);
+			object_value=(0.5/lambda)*pure_dot(temp,temp,K)-pure_dot(R+u*N,alpha,N)+0.5*pure_dot(alpha,alpha,N);
 
 			delete[] temp;
 			// }
-			cout <<"D="<<u<<", iter=" << iter <<" ,object_value="<<object_value<<endl ;			
+			cout <<"D="<<u<<", iter=" << iter <<" ,object_value="<<object_value<<endl ;				      */
 			shuffle(index);
 			iter++;
 		}
@@ -146,6 +147,8 @@ void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V
 		//update V;
 		for(int i=0;i<K;i++)
 			*(V+u+i*D)= max(0.0, w[i]);
+		for(int i=0;i<N;i++)
+			A[i*D+u] = alpha[i];
 	}
 	//release memory
 	// for(int i=0;i<K;i++){
@@ -156,6 +159,9 @@ void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V
 	// }
 	*objCD = get_objvalue_d(R,V,Z,N,K,D);
 	change_major(V,D,K);
+
+	delete[] w;
+	delete[] alpha;
 }
 void usage()
 {
