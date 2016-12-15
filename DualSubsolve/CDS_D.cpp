@@ -27,6 +27,13 @@ void change_major(double* v,int n,int m){
 
 }
 
+void change_major(double* v,int n,int m, double* v2){
+	//convert m*n to n*m
+	v2[0]=v[0];
+	for(int i=1;i<n*m;i++) 	
+		v2[(i/n)+(i%n)*m]=v[i];
+}
+
 double pure_dot( double* v, double* x ,int numFea){
 	double sum=0.0;
 	for(int i=0;i<numFea;i++){
@@ -65,10 +72,11 @@ inline double get_objvalue_d(double* R, double* V, double* Z,int N,int K,int D){
 	delete[] temp_row;
 	return 0.5*result;
 }
-void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V, double* A,double* objCD,int N,int D, int K){
+void coordinate_solver(double* R,double* Z_input,int max_iter,double lambda, double* V, double* A,double* objCD,int N,int D, int K){
 	//calculate Hessian diagonal
 	double* H_bound = new double [N];
-	change_major(Z,N,K);
+	double* Z = new double[N*K];
+	change_major(Z_input, N,K, Z);
 	for(int i=0;i<N;i++){
 		double square_sum = 0.0;
 		for(int j=0;j<K;j++){
@@ -142,13 +150,14 @@ void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V
 		}
 
 		
-		cerr << endl;
+		//cerr << endl;
 		//output u_th model
 		//update V;
 		for(int i=0;i<K;i++)
-			*(V+u+i*D)= max(0.0, w[i]);
+			*(V+i+u*K)= max(0.0, w[i]);
+			//*(V+i+u*K) = i + u*K;
 		for(int i=0;i<N;i++)
-			A[i*D+u] = alpha[i];
+			*(A+i+u*N) = alpha[i];
 	}
 	//release memory
 	// for(int i=0;i<K;i++){
@@ -158,8 +167,8 @@ void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V
 	// 	cout<<endl;
 	// }
 	*objCD = get_objvalue_d(R,V,Z,N,K,D);
-	change_major(V,D,K);
 
+	delete[] Z;
 	delete[] w;
 	delete[] alpha;
 }
