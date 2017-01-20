@@ -38,20 +38,28 @@ double pure_dot( double* v, double* x ,int numFea){
 	}	
 	return sum;
 }
-inline double* get_sparse_row(vector< Instance* >* data ,int row ,int position,int numFea){
+double pure_dot_x_nng( double* v, double* x ,int numFea){
+	double sum=0.0;
+	for(int i=0;i<numFea;i++){
+		double xi = *(x+i);
+		if( xi > 0.0 )
+			sum += (*(v+i))*xi;
+	}	
+	return sum;
+}
+inline double* get_sparse_row(vector< Instance* >* data ,int position,int numFea){
    int N = data->size();
-   if(row==1){
-   		double* v = new double[numFea];
+   double* v = new double[numFea];
     	Instance* ins = data->at(position);
     	for(int i=0;i<numFea;i++)
     		v[i]=0.0;
     	for(int i=0;i<ins->xi.size();i++){			
 			int index = ins->xi[i].first;
 			double value = ins->xi[i].second;
-			v[index-1]=value;			
+			v[index]=value;			
 		} 		 
-		return v;  	
-    }   
+	return v;  	
+   
 }
 inline double get_objvalue(double** R, double** V, vector< Instance* >* Z,int N,int K,int D){
 	double result=0.0;
@@ -62,7 +70,7 @@ inline double get_objvalue(double** R, double** V, vector< Instance* >* Z,int N,
      	}
     	Instance* ins = Z->at(i);
     	for(int j=0;j<ins->xi.size();j++){			
-			int index = ins->xi[j].first-1;
+			int index = ins->xi[j].first;
 			double value = ins->xi[j].second;
 			for(int k=0;k<D;k++){
 				temp_row[k]+=value*V[index][k];
@@ -96,7 +104,7 @@ inline double get_objvalue_d(double* R, double* V, double* Z,int N,int K,int D){
     delete[] temp_row;
     return 0.5*result;
 }
-void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V, double* alpha ,double& objCD,int N,int D, int K){
+void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V, double* A ,double& objCD,int N,int D, int K){
 
   //calculate Hessian diagonal
   	double* H_bound = new double [N];
@@ -109,92 +117,52 @@ void coordinate_solver(double* R,double* Z,int max_iter,double lambda, double* V
 	}
 	//initialize 
 	double* w = new double[K];
+	double* alpha = new double[N];
 	double object_value;
-    vector<int> index;
+	vector<int> index;
 	for(int i=0;i<N;i++)
 		index.push_back(i);
 	int iter;
 	//iteration
 	for(int u=0;u<D;u++){	
-	 	shuffle(index);
+		shuffle(index);
 		iter=0;
 		//initialize 
 		for(int i=0;i<K;i++)
-		  w[i] = 0.0;
+			w[i] = 0.0;
 		for(int i=0;i<N;i++)
-		  *(alpha+u*N+i) = 0.0;
+			alpha[i] = 0.0;
 		object_value=0.0;
-		//reach R_u
 		while(iter < max_iter){
-		    
-			double update_time = -omp_get_wtime();
 			//start inner loop
 			for(int r=0;r<N;r++){ 
 				//choose random gradient to update
 				int i = index[r];
 				//1. compute gradient of i 
-				double gi = (1.0/lambda)*pure_dot(Z+K*i,w,K)-*(R+u*N+i)+*(alpha+u*N+i);
+				double gi = (1.0/lambda)*pure_dot_x_nng(Z+K*i,w,K)-*(R+u*N+i)+alpha[i];
 				//2. compute alpha_u_i
-				double new_alpha = *(alpha+u*N+i)-gi/H_bound[i];
+				double new_alpha = alpha[i]-gi/H_bound[i];
 				//3. maintain w
-				double alpha_diff = new_alpha-*(alpha+u*N+i);
+				double alpha_diff = new_alpha-alpha[i];
 				if(  fabs(alpha_diff) > 1e-8 ){
 					for(int o=0;o<K;o++){
-						w[o]=max(0.0,w[o]+alpha_diff*(*(Z+K*i+o)));
+						w[o] = w[o]+alpha_diff*(*(Z+K*i+o));
 					}			
-					*(alpha+u*N+i) = new_alpha;
+					alpha[i] = new_alpha;
 				}				
 			}
-			update_time += omp_get_wtime();
-			//if(iter%10==0)
-			//computer object_value, overhead?
-			//if(iter%10==0){
-				double* temp = new double[K];				
-				for(int i=0;i<K;i++){
-					temp[i]=0.0;
-				}			
-				for(int i=0;i<N;i++){
-					for(int j=0;j<K;j++){
-						temp[j]=temp[j]+*(alpha+i+u*N)*(*(Z+i*K+j));					
-					}
-				}
-				//take positive
-				for(int j=0;j<K;j++){
-						temp[j]=max(0.0,temp[j]);
-				}
-				object_value=(0.5/lambda)*pure_dot(temp,temp,K)-pure_dot(R+u*N,alpha+u*N,N)+0.5*pure_dot(alpha+u*N,alpha+u*N,N);
-				
-			    delete[] temp;
-		   // }
-			cerr <<"D="<<u<<", iter=" << iter << ", time=" << update_time <<" ,object_value="<<object_value<<endl ;			
-			shuffle(index);
-			iter++;		
+     		shuffle(index);
+			iter++;
 		}
-		
-		cerr << endl;
-		//output u_th model
-	//update V;
-	for(int i=0;i<K;i++)
-		*(V+u+i*D)=w[i];
-    }
-	//release memory
-	for(int i=0;i<K;i++){
-		for(int j=0;j<D;j++){
-			printf("V[%d][%d]=%lf ",i,j,*(V+i*D+j));
-		}
-		cout<<endl;
+		for(int i=0;i<K;i++)
+			*(V+i+u*K)= max(0.0, w[i]);
+		for(int i=0;i<N;i++)
+			*(A+i+u*N) = alpha[i];
 	}
 	objCD = get_objvalue_d(R,V,Z,N,K,D);
+	delete[] w;
+	delete[] alpha;
 }
-// void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[]){
-	
-// 	 if (nrhs!=3)
-// 	 	mexErrMsgTxt("Usage:");
-
-
-    
-// }
-//index start from 1 in the data  
 int main(int argc, char** argv){
 
 	
@@ -224,12 +192,12 @@ int main(int argc, char** argv){
 	cerr << "D=" << D << endl;
 	cerr << "K=" << K << endl;	
 	double* w = new double[K];
-	double* alpha = new double[N*D];
+	double* A = new double[N*D];
 	double* R = new double[N*D];
 	double* Z = new double[N*K];
 	double* V =new double[K*D]; 
 	double objCD;	
-	//compute upper bound and initialization
+	//initialize R and Z to be dense matrix
 	for (int j=0;j<D;j++){
 		for(int i=0;i<N;i++)
 			*(R+j*N+i)=0.0;
@@ -239,7 +207,7 @@ int main(int argc, char** argv){
 		 for(int i=0;i<ins->xi.size();i++){			
 				int index = ins->xi[i].first;
 				double value = ins->xi[i].second;
-				*(R+(index-1)*N+j)=value;					
+				*(R+(index)*N+j)=value;					
 		    }
     } 
     for (int j=0;j<K;j++){
@@ -251,10 +219,10 @@ int main(int argc, char** argv){
 		 for(int i=0;i<ins->xi.size();i++){			
 				int index = ins->xi[i].first;
 				double value = ins->xi[i].second;
-				*(Z+j*K+index-1)=value;					
+				*(Z+j*K+index)=value;					
 		    }
     }     
-    coordinate_solver(R,Z,max_iter,lambda,V,alpha,objCD,N,D,K);  
+    coordinate_solver(R,Z,max_iter,lambda,V,A,objCD,N,D,K);  
     cout<<"Final result:"<<objCD<<endl;
 	
 }
