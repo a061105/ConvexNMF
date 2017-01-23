@@ -82,7 +82,7 @@ class MaxCutSolve{
 		for(int i=0;i<N;i++)
 			f->setValue(i,0,x[i]);
 		
-		return f->funVal();
+		return f->funVal_with_constant();
 	}
 	
 	SDPSolve* _sdp_solve;

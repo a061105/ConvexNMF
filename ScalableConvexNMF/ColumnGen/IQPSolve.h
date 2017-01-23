@@ -1,6 +1,3 @@
-#ifndef IQPSOLVE_H
-#define IQPSOLVE_H
-
 #include "util.h"
 #include "MaxCutSolve.h"
 
@@ -27,7 +24,7 @@ class IQPSolve{
 			_b.resize(N);
 			_fun->sum_by_row(_b.begin(), _b.end());
 			for(int i=0;i<N;i++)
-				_b[i] /= 2.0;
+				_b[i] /= 4.0;
 		}
 		virtual void getDim(int& N, int& K){
 			_fun->getDim(N,K);
@@ -65,7 +62,7 @@ class IQPSolve{
 				_fun->grad(i-1,g);
 				for(int k=0;k<K;k++){
 					g[k] /= 4.0;
-					g[k] += _X0[k]*_b[i-1];
+					g[k] += 2.0*_X0[k]*_b[i-1];
 				}
 			}
 		}
@@ -80,6 +77,14 @@ class IQPSolve{
 				fval += 2.0*tmp[k]*_X0[k];
 			
 			fval += _fun->funVal()/4.0;
+
+			return fval;
+		}
+
+		double funVal_with_constant(){
+			
+			double fval = funVal();
+			fval += _fun->sum_C()/4.0;
 
 			return fval;
 		}
@@ -123,5 +128,3 @@ class IQPSolve{
 	
 	MaxCutSolve* _maxcut_solve;
 };
-
-#endif

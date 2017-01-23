@@ -77,7 +77,21 @@ vector<string> split(string str, string pattern){
 	return str_split;
 }
 
-void readMat(char* fname, int& N, Matrix& mat){
+void readMat(char* fname, int& N, int& D, Matrix& mat){
+	ifstream fin(fname);
+	
+	fin >> N >> D;
+	mat.resize(N);
+	for(int i=0;i<N;i++)
+		mat[i].resize(D);
+	
+	for(int i=0;i<N;i++)
+		for(int j=0;j<D;j++){
+			fin >> (mat[i][j]);
+		}
+}
+
+void readSymMat(char* fname, int& N, Matrix& mat){
 	ifstream fin(fname);
 	
 	fin >> N;

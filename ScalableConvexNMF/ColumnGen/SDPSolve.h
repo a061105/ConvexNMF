@@ -49,7 +49,7 @@ class MixSDPSolve: public SDPSolve{
 		g.resize(K);
 		Vector tmp_Xi;
 		tmp_Xi.resize(K);
-		int max_iter = 10;
+		int max_iter = 100;
 		int iter=0;
 		while(iter<max_iter){
 			
@@ -64,7 +64,7 @@ class MixSDPSolve: public SDPSolve{
 			}
 			
 			if( iter % 1 == 0 )
-				cerr << "iter=" << iter << ", obj=" <<  f->funVal()  << endl;
+				cerr << "iter=" << iter << ", obj=" <<  f->funVal_with_constant()  << endl;
 			
 			iter++;
 		}

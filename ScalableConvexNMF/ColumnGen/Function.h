@@ -32,6 +32,8 @@ class Function{
 	/* Compute the current function value tr(X'CX).
 	 */ 
 	virtual double funVal() = 0;
+
+	virtual double funVal_with_constant() = 0;
 };
 
 class ExtensibleFunction: public Function{
@@ -42,6 +44,8 @@ class ExtensibleFunction: public Function{
 	virtual void sum_by_row(Vector::iterator s_begin, Vector::iterator s_end)=0;
 	
 	virtual void Xtv(Vector& v, Vector& Xtv)=0;
+	
+	virtual double sum_C() = 0;
 };
 
 #endif
