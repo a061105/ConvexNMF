@@ -1,0 +1,21 @@
+This is R_syn2
+error=51844.5,k=1,training=3.256433
+error=42944.5,k=2,training=0.445198
+error=42678,k=3,training=0.355879
+error=40574.6,k=4,training=0.376740
+error=36642.4,k=5,training=0.664978
+error=33833.4,k=6,training=0.375955
+error=31798.8,k=7,training=0.263509
+error=21619.9,k=8,training=0.196790
+error=21249.4,k=9,training=0.417314
+error=16372.6,k=10,training=0.261717
+error=11884.6,k=11,training=0.419464
+error=8666.62,k=12,training=0.431096
+error=2677.16,k=13,training=0.453313
+error=88.5727,k=14,training=0.720100
+error=88.4796,k=15,training=1.394034
+error=88.393,k=16,training=1.915668
+error=88.2789,k=17,training=2.173844
+error=88.2124,k=18,training=2.345947
+error=88.2021,k=19,training=3.274766
+error=88.0051,k=20,training=4.390714

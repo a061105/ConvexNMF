@@ -1,0 +1,11 @@
+This is R_yale
+error=20392.5,k=5,training=2.066794
+error=19029.3,k=10,training=0.248966
+error=13020.5,k=15,training=0.391511
+error=12814.8,k=20,training=1.578834
+error=14256.3,k=25,training=14.241650
+error=12895.4,k=30,training=281.961226
+error=94155.4,k=35,training=0.579351
+error=65152.5,k=40,training=0.796260
+error=69801.1,k=45,training=0.695540
+error=86490.7,k=50,training=0.693193

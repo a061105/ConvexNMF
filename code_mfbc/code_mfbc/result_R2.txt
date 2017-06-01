@@ -1,0 +1,11 @@
+This is R2
+error=5.98675e+06,k=5,training=2.309579
+error=5.62066e+06,k=10,training=0.699163
+error=5.47458e+06,k=15,training=1.026367
+error=3.91595e+06,k=20,training=5.527254
+error=97.2596,k=25,training=102.992101
+error=96.7435,k=30,training=3458.670655
+error=7.52454e+06,k=35,training=1.197161
+error=7.31775e+06,k=40,training=1.372052
+error=7.69168e+06,k=45,training=3.509403
+error=7.33578e+06,k=50,training=2.842375

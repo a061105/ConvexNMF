@@ -19,10 +19,19 @@ class SDPSolve{
 	
 	public:
 	virtual void solve(Function* f, Matrix& X) = 0;
+	virtual void setIter(int iter)=0;
 };
 
 class MixSDPSolve: public SDPSolve{
 	public:
+	
+	MixSDPSolve(){
+		_iter = 10;
+	}
+	
+	virtual void setIter(int iter){
+		_iter = iter;
+	}
 	
 	virtual void solve(Function* f, Matrix& X){
 		
@@ -35,10 +44,9 @@ class MixSDPSolve: public SDPSolve{
 			
 			randn(X[i], K);
 			normalize(X[i], X[i]);
-			
 			f->setValues(i, X[i].begin(), X[i].end());
 		}
-		cerr << "init obj=" << f->funVal() << endl;
+		//cerr << "init obj=" << f->funVal() << endl;
 		//main loop
 		vector<int> indexes;
 		indexes.resize(N);
@@ -49,7 +57,7 @@ class MixSDPSolve: public SDPSolve{
 		g.resize(K);
 		Vector tmp_Xi;
 		tmp_Xi.resize(K);
-		int max_iter = 100;
+		int max_iter = _iter;
 		int iter=0;
 		while(iter<max_iter){
 			
@@ -59,16 +67,21 @@ class MixSDPSolve: public SDPSolve{
 				int i = indexes[r];
 				
 				f->grad(i, g);
-				normalize(g, X[i]);
+				double norm2 = normalize(g, X[i]);
+				if( norm2 == 0.0 )
+					continue;
 				f->setValues(i, X[i].begin(), X[i].end());
 			}
 			
-			if( iter % 1 == 0 )
-				cerr << "iter=" << iter << ", obj=" <<  f->funVal_with_constant()  << endl;
+			//if( iter % 1 == 0 )
+				//cerr << "SDPiter=" << iter << ", obj=" <<  f->funVal_with_constant()  << endl;
 			
 			iter++;
 		}
 	}
+
+	private:
+	int _iter;
 };
 
 #endif

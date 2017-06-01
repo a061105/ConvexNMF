@@ -1,0 +1,11 @@
+This is tabletop
+error=3111.49,k=1,training=0.367600
+error=2021.21,k=2,training=0.246978
+error=1103.01,k=3,training=0.190960
+error=677.675,k=4,training=0.132955
+error=598.23,k=5,training=0.141492
+error=587.221,k=6,training=0.130919
+error=599.586,k=7,training=0.125533
+error=579.523,k=8,training=0.174368
+error=625.539,k=9,training=0.219277
+error=544.766,k=10,training=0.220050

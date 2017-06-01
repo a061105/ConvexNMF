@@ -1,0 +1,90 @@
+-------------------------------------------------------
+Variational Inference for the IBP.
+-------------------------------------------------------
+
+This package contains code for doing variational inference for the
+Indian Buffet Process. The code is self-contained and runs with recent
+Matlab distributions (we have tested it with r2008a and r2007a).
+Please contact Finale Doshi-Velez at finale@alum.mit.edu or Kurt
+Miller at ktmiller@gmail.com for questions and feedback (and bug-fixes
+:).  Below we describe the different files in the distribution.
+
+
+References:
+
+Variational Inference for the Indian Buffet Process
+Finale Doshi-Velez, Kurt T. Miller, Jurgen Van Gael and Yee Whye Teh
+Conference on Artificial Intelligence and Statistics (AISTATS 2009).
+
+Variational Inference for the Indian Buffet Process
+Finale Doshi-Velez, Kurt T. Miller, Jurgen Van Gael and Yee Whye Teh
+University of Cambridge, Engineering Department, Technical Report CBL-2009-001.
+
+
+
+Files included in the distribution:
+* tester.m: this is the main starting point for any experiments. It
+  shows how to set up the data structures for the parameters of the
+  inference algorithms and then runs the following algorithms:
+  - finite LG variational
+  - infinite LG variational
+  - infinite iICA variational (to be made available soon)
+  - finite iICA variational (to be made available soon)
+* run_vibp.m: Runs variational inference for a finite or infinite IBP
+  model.
+* data.mat: example test data.  This is very simple data generated
+  from a linear Gaussian model.
+
+* vibp_base/compute_variational_lower_bound.m: Computes the lower
+  bound on the log marginal likelihood of the data based on the
+  variational parameters.
+* vibp_base/vibp.m: Performs the variational updates for the finite
+  model and keeps track of the lower bound.
+
+* util/minimize.m: Minimize a differentiable multivariate function.
+* util/v2pi.m: Converts stick-breaking variables v into feature
+  probabilities pi.
+
+* heuristics/run_search_heuristics.m: Run different heuristics
+  (swapping features, subtracting features, ...) for improving the
+  variational lower bound.
+* heuristics/update_feature_order.m: Updates the features to be in
+  descending order of probability.
+* heuristics/update_small_model.m: updates a model proposal,
+  increasing the subset of the data used.
+* heuristics/initialise_small_model.m: initializes a model proposal
+  using a subset of the data.
+
+* vibp_finite/compute_var_theta_k.m: Computes an intermediate value
+  for the update for the finite variational parameter nu.
+* vibp_finite/update_tau.m: Performs the update for the finite
+  variational parameter tau.
+
+* vipb_infinite/compute_expected_pzk0_qjensen.m: Computes 
+  E[ ln( 1 - prod( 1 - v ) ) ] using Jensen's inequality and a
+  variational multinomial distribution q (see paper for details).
+* vipb_infinite/compute_var_theta_k.m: Computes an intermediate value
+  for the update for the infinite variational parameter nu.
+* vipb_infinite/update_tau.m: Performs the update for the infinite
+  variational parameter tau.
+
+
+Change Log
+----------
+
+v 1.0 - May 2009
+* Initial release at http://mloss.org/revision/view/230/
+
+===========================================================================
+(C) Copyright, Finale Doshi-Velez, Kurt T. Miller, Jurgen Van Gael
+
+Permission is granted for anyone to copy, use, or modify these
+programs and accompanying documents for purposes of research or
+education, provided this copyright notice is retained, and note is
+made of any changes that have been made.
+
+These programs and documents are distributed without any warranty,
+express or implied.  As the programs were written for research
+purposes only, they have not been tested to the degree that would be
+advisable in any important application.  All use of these programs is
+entirely at the user's own risk.

@@ -104,6 +104,11 @@ class LowRankFunc:public ExtensibleFunction{
 		}
 		for(int k=0;k<_K;k++)
 			g[k] *= 2.0;
+		///////////////////////////////////adding eye(N)
+		/*for(int k=0;k<_K;k++){
+			g[k] -= 0.2*_X[i][k];
+		}*/
+		/////////////////////////////////////////////
 	}
 	
 	double funVal(){
@@ -111,6 +116,13 @@ class LowRankFunc:public ExtensibleFunction{
 		for(int j=0;j<_D;j++)
 			for(int k=0;k<_K;k++)
 				sum += _AtX[j][k]*_AtX[j][k];
+		//////////////////////////////////////////////////////Adding eye(N)
+		/*for(int j=0;j<_D;j++){
+			for(int k=0;k<_K;k++){
+				sum -= 0.1*_X[j][k]*_X[j][k];
+			}
+		}*/
+		///////////////////////////////////////////////////////////
 		return sum;
 	}
 
@@ -133,6 +145,11 @@ class LowRankFunc:public ExtensibleFunction{
 			}
 			*(s_begin+i) = sum;
 		}
+		//////////////////////////////////adding eye(N)
+		/*for(int i=0;i<_N;i++){
+			*(s_begin+i) -= 0.1;
+		}*/
+		////////////////////////////////////////////////
 	}
 	
 	void Xtv(Vector& v, Vector& Xtv){
@@ -154,6 +171,7 @@ class LowRankFunc:public ExtensibleFunction{
 			double sum = 0.0;
 			for(int i=0;i<_N;i++)
 				sum += tmp[i];
+			_sum_C_cache = sum;
 			return sum;
 		}else
 			return _sum_C_cache;
@@ -163,7 +181,7 @@ class LowRankFunc:public ExtensibleFunction{
 	virtual double funVal_with_constant(){
 		return 0.0;
 	}
-
+	
 	private:
 	Matrix _A; //N by D
 	Matrix _X; //N by K

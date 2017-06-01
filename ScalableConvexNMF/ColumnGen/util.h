@@ -125,13 +125,17 @@ double norm_sq( double* v, int size ){
 }
 
 
-void normalize(Vector& x, Vector& x2){
+double normalize(Vector& x, Vector& x2){
 	
 	double sum = 0.0;
 	for(int i=0;i<x.size();i++)
 		sum += x[i]*x[i];
+	
+	if( sum == 0.0 )
+		return 0.0;
+	
 	sum = sqrt(sum);
-
+	
 	x2.resize( x.size() );
 	for(int i=0;i<x.size();i++)
 		x2[i] = x[i]/sum;
@@ -153,6 +157,19 @@ double sum(Vector& v){
 	for(int i=0;i<v.size();i++)
 		s += v[i];
 	return s;
+}
+
+
+void transpose( Matrix& A, int N, int D, Matrix& B){
+	
+	B.resize(D);
+	for(int j=0;j<D;j++)
+		B[j].clear();
+	for(int i=0;i<N;i++){
+		for(int j=0;j<D;j++){
+			B[j].push_back(A[i][j]);
+		}
+	}
 }
 
 #endif

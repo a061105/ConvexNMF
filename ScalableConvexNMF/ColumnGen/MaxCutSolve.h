@@ -14,6 +14,10 @@ class MaxCutSolve{
 		_T = 100;
 	}
 	
+	void setIter(int iter){
+		_sdp_solve->setIter(iter);
+	}
+
 	void solve(Function* f, Vector& x){
 		
 		int N, K;
@@ -35,7 +39,6 @@ class MaxCutSolve{
 			Vector x_t = sign(mat_prod( X, r, K ));
 			//Vector x_t = mat_prod( X, r, K );
 			double obj = objective( f, x_t );
-			
 			if( obj > max_obj ){
 				max_obj = obj;
 				x = x_t;

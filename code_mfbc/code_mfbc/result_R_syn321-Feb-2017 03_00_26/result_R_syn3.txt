@@ -1,0 +1,11 @@
+This is R_syn3
+error=   76242.7,k=5,training=2.437161
+error=   73219.6,k=10,training=0.740804
+error=   67293.2,k=15,training=0.885936
+error=   53476.9,k=20,training=5.449961
+error=   47094.5,k=25,training=97.564575
+error=   27748.5,k=30,training=2508.158011
+error=    112413,k=35,training=1.125893
+error=     92326,k=40,training=2.073047
+error=   84883.7,k=45,training=2.294013
+error=     92392,k=50,training=2.462412

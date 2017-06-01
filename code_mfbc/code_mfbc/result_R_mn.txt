@@ -1,0 +1,11 @@
+This is R_mn
+error=61477.2,k=5,training=1.819248
+error=58852.8,k=10,training=0.786730
+error=57280.8,k=15,training=0.961242
+error=61255.7,k=20,training=6.017460
+error=54699.4,k=25,training=155.030129
+error=51489.8,k=30,training=3732.044958
+error=61706.5,k=35,training=0.433690
+error=54770,k=40,training=0.805971
+error=51036.5,k=45,training=1.007055
+error=52918.6,k=50,training=0.821181

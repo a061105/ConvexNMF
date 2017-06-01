@@ -10,6 +10,10 @@ class IQPSolve{
 		_maxcut_solve = new MaxCutSolve();
 	}
 	
+	void setIter(int iter){
+		_maxcut_solve->setIter(iter);
+	}
+
 	/** A function decorator that, given a function f0=tr(X'CX), obtains
 	 *  another function f1=tr(X2'C2X2) where
 	 *  C2 = [0 b'         X2=[X0;
@@ -34,8 +38,9 @@ class IQPSolve{
 		virtual void setValues(int i, Vector::iterator xi_begin, Vector::iterator xi_end){
 			if( i == 0 ){
 				_X0 = Vector(xi_begin, xi_end);
-			}else
+			}else{
 				_fun->setValues(i-1, xi_begin, xi_end);
+			}
 		}
 		
 		virtual void setValue(int i, int k, double xik){
@@ -85,7 +90,7 @@ class IQPSolve{
 			
 			double fval = funVal();
 			fval += _fun->sum_C()/4.0;
-
+			
 			return fval;
 		}
 
@@ -112,7 +117,9 @@ class IQPSolve{
 		cerr << "IQP obj=" << objective( f, x ) << endl;
 	}
 	
+	
 	private:
+	
 	
 	double objective(Function* f, Vector& x){
 
@@ -126,5 +133,7 @@ class IQPSolve{
 		return f->funVal();
 	}
 	
+	
 	MaxCutSolve* _maxcut_solve;
+	
 };

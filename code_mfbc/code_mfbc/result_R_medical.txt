@@ -1,0 +1,12 @@
+This is R_medical
+error=11193.5,k=5,training=2.383358
+error=9743.27,k=10,training=1.078895
+error=10467,k=15,training=1.074355
+error=9157.61,k=20,training=4.818641
+error=8867.53,k=25,training=81.203283
+error=8388.8,k=30,training=2020.958016
+error=11353.3,k=35,training=2.707858
+error=10253.2,k=40,training=1.801587
+error=10615.3,k=45,training=2.169295
+error=10406.9,k=50,training=2.423607
+error=10291.1,k=55,training=2.835828
