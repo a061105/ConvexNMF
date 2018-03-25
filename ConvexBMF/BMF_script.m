@@ -63,7 +63,7 @@ R = sparse(R);
 %true_error = norm(R-Z0*W0,'fro')^2
 %solve 
 %R_mean = ones(N,1)*mean(R);
-[Z,V,c] = convexNMF01( R, Lambda, Tau, Z0, K_range );
+[Z,V,c] = convexBMF( R, Lambda, Tau, Z0, K_range );
 
 
 %L = length(K_range);
@@ -105,7 +105,7 @@ R = sparse(R);
 %cV = V*diag(sqrt(c));
 %cZ = Z*diag(sqrt(c));
 %
-%%obj_true = NMFPrimalLoss(10*R/sqr_Tau, Z0/sqr_Tau, V_true) + (Lambda/Tau)*K
+%%obj_true = PrimalLoss(10*R/sqr_Tau, Z0/sqr_Tau, V_true) + (Lambda/Tau)*K
 %
 %%find top support
 [c,ind]=sort(c,'descend'); 

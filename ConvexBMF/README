@@ -1,0 +1,22 @@
+Few things to note:
+
+1.  The main script is the file "BMF_script.m". The main algorithm is in
+"convexBMF.m".
+
+2.  The file MixMaxCut.mexa64 might not be
+runnable on your system. In that case, you can download the source here and
+re-compile it through matlab MEX: 
+
+https://github.com/a061105/MixingSDPSolve
+
+3. The matrix "P" printed out at each iteration denotes the coefficients "c"
+and whether they match one of a ground-truth latent feature. For example:
+
+0         9.0000   7.0000
+127.4914  3.2911   3.2250
+
+means that the 1st coefficient of magnitude 127.4914 matches nothing, while
+the 2nd matches 9th latent feature in the ground truth.
+
+4. You might need to tune the step size "eta_rate" in convexBMF.m to be
+smaller if observing an "increase" of objective during iterates.

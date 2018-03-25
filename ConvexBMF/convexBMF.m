@@ -1,4 +1,4 @@
-%%Solving the convex NMF problem:
+%%Solving the convex BMF problem:
 %%
 %%   min_{Z\in{0,1}^{N,K}, V>=0}  \frac{1}{2}\|R-ZV'\|_F^2 + \frac{1}{2}\|V\|_F^2 + Lambda*\|ZZ'\|_{S}
 %%
@@ -8,7 +8,7 @@
 %%
 %%where G= Z' \ beta,   B = [-Z'A]_+  (s.t. B+Z'A=[Z'A]_+)
 
-function [Z,V,c] = convexNMF01( R, Lambda, Tau, Z0, K_range )
+function [Z,V,c] = convexBMF( R, Lambda, Tau, Z0, K_range )
 
 TOL = 1e-4;
 T = 100;
@@ -45,8 +45,8 @@ for t = 1:T
 	[V,A] = LS_solve( R, Zc, Tau );
 	%dump info
 	%%%!!!PrimalLoss forgot to Multplier Tau !!
-	dobj = NMFDualLoss( R, Zc, A, Tau ) + Lambda*sum(c);
-	pobj = NMFPrimalLoss( R, Zc, V, Tau ) + Lambda*sum(c);
+	dobj = DualLoss( R, Zc, A, Tau ) + Lambda*sum(c);
+	pobj = PrimalLoss( R, Zc, V, Tau ) + Lambda*sum(c);
 	['t=' num2str(t) ', d-obj=' num2str(dobj) ', p-obj=' num2str(pobj) ', nnz(c)=' num2str(nnz(c))]
 
 	%if mod(t,10) == 0 
